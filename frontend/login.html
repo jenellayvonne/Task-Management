@@ -1,94 +1,35 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f7fc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: white;
-      padding: 2rem 3rem;
-      border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      width: 320px;
-    }
-    h2 {
-      margin-bottom: 1.5rem;
-      color: #333;
-      text-align: center;
-    }
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 10px 12px;
-      margin: 8px 0 8px 0; /* reduced bottom margin for spacing */
-      display: inline-block;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"]:focus, input[type="password"]:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-    .forgot-password {
-      display: block;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      color: #007bff;
-      text-align: right;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .forgot-password:hover {
-      text-decoration: underline;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .register-link {
-      margin-top: 1rem;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-    .register-link a {
-      color: #007bff;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .register-link a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>
+<body class="login-page">
+  <div id="notification-container"></div>
   <div class="container">
-    <h2>Login</h2>
+    <div class="avatar">
+      <i class="fas fa-user"></i>
+    </div>
     <form id="loginForm">
-      <input type="text" name="username" placeholder="Username" required autocomplete="username" />
-      <input type="password" name="password" placeholder="Password" required autocomplete="current-password" />
-      <a href="forgot-password.html" class="forgot-password">Forgot Password?</a>
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" name="username" placeholder="Username" required autocomplete="username" />
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" name="password" id="password" placeholder="Password" required autocomplete="current-password" />
+        <span class="show-password" id="show-password-toggle"><i class="fas fa-eye-slash"></i></span>
+      </div>
+      <div class="options">
+        <label class="remember-me">
+          <input type="checkbox" name="remember"> Remember me
+        </label>
+        <a href="#" class="forgot-password">Forgot Password?</a>
+      </div>
       <button type="submit">Login</button>
     </form>
     <p class="register-link">
@@ -98,6 +39,31 @@
 
   <script>
     const form = document.getElementById('loginForm');
+    const notificationContainer = document.getElementById('notification-container');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('show-password-toggle');
+
+    const showNotification = (message, isError = false) => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${isError ? 'error' : ''}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => notification.classList.add('show'), 10);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    };
+
+    togglePasswordIcon.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        togglePasswordIcon.querySelector('i').classList.toggle('fa-eye');
+        togglePasswordIcon.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -116,15 +82,14 @@
 
         const result = await response.json();
         if (response.ok) {
-          // ✅ Save token to localStorage
           localStorage.setItem('token', result.token);
-          alert('Login successful!');
-          window.location.href = '/tasks.html';
+          localStorage.setItem('userName', data.username);
+          window.location.href = 'tasks.html';
         } else {
-          alert(result.message || 'Login failed');
+          showNotification(result.message || 'Login failed', true);
         }
       } catch (err) {
-        alert('An error occurred. Please try again.');
+        showNotification('An error occurred. Please try again.', true);
       }
     });
   </script>

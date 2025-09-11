@@ -2,268 +2,347 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Task Dashboard</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f7fc;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-
-    .task-list {
-      margin-top: 2rem;
-    }
-
-    .task {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .task h3 {
-      margin: 0 0 0.5rem 0;
-      color: #007bff;
-    }
-
-    form {
-      margin-top: 2rem;
-      padding: 1rem;
-      border-top: 1px solid #ddd;
-    }
-
-    form input, form textarea, form select {
-      display: block;
-      width: 100%;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-
-    button {
-      padding: 10px 16px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-
-    .logout-btn {
-      background-color: #dc3545;
-      float: right;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Todo List</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>
-  <div class="container">
-    <button class="logout-btn" onclick="logout()">Logout</button>
-    <h2>Your Tasks</h2>
-    
-    <div id="taskList" class="task-list"></div>
+<body class="tasks-page">
+  <div id="notification-container"></div>
 
-    <form id="taskForm">
-      <h3>Add New Task</h3>
-      <input type="text" id="name" placeholder="Task Name" required />
-      <textarea id="description" placeholder="Description"></textarea>
-      <select id="status">
-        <option value="pending">Pending</option>
-        <option value="in progress">In Progress</option>
-        <option value="done">Done</option>
-      </select>
-      <label>Start Date:</label>
-      <input type="date" id="startDate" />
-      <label>Due Date:</label>
-      <input type="date" id="dueDate" />
-      <button type="submit">Add Task</button>
-    </form>
+  <div class="tasks-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Welcome back, <span id="userName">USER</span>!</h2>
+      </div>
+      <div class="avatar-container">
+        <div class="avatar" id="userAvatar">U</div>
+      </div>
+      <section class="stats-section">
+        <div class="stat-card">
+          <span class="stat-number" id="totalTasks">0</span>
+          <span class="stat-label">Total tasks</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="pendingTasks">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="completedTasks">0</span>
+          <span class="stat-label">Completed</span>
+        </div>
+      </section>
+      <div class="sidebar-buttons">
+        <div id="theme-toggle" title="Toggle Theme">
+          <i class="fas fa-moon"></i>
+          <i class="fas fa-sun"></i>
+        </div>
+        <button id="profileBtn">Profile</button>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section class="task-input-section">
+        <div class="input-field">
+          <label for="taskInput">Task name</label>
+          <input type="text" id="taskInput" placeholder="Add new task" />
+        </div>
+        <div class="input-field">
+          <label for="startDateInput">Start date</label>
+          <input type="date" id="startDateInput" />
+        </div>
+        <div class="input-field">
+          <label for="prioritySelect">Priority level</label>
+          <select id="prioritySelect">
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="input-field">
+          <label for="dueDateInput">Due date</label>
+          <input type="date" id="dueDateInput" />
+        </div>
+        <div class="input-field">
+          <label for="statusSelect">Status</label>
+          <select id="statusSelect">
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="input-field description-field">
+          <label for="taskDescriptionInput">Description</label>
+          <textarea id="taskDescriptionInput" placeholder="Enter a description..."></textarea>
+        </div>
+        <button id="addTaskBtn">Add task</button>
+      </section>
+
+      <section class="tasks-list-section">
+        <div class="list-header">
+          <h2>Widgets</h2>
+          <div class="filter-field">
+            <label for="filterPriority">Filter by Priority:</label>
+            <select id="filterPriority">
+              <option value="all">All priorities</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div id="taskList">
+          <!-- Tasks will be dynamically inserted here -->
+        </div>
+      </section>
+    </main>
   </div>
 
-  <script>
-  const token = localStorage.getItem('token');
-  let editingTaskId = null;
-
-  if (!token) {
-    alert('You are not logged in.');
-    window.location.href = '/login.html';
-  }
-
-  function logout() {
-    localStorage.removeItem('token');
-    window.location.href = '/login.html';
-  }
-
-  async function fetchTasks() {
-    try {
-      const response = await fetch('/tasks', {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      });
-
-      const data = await response.json();
-      const taskList = document.getElementById('taskList');
-      taskList.innerHTML = '';
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to load tasks');
-      }
-
-      if (data.length === 0) {
-        taskList.innerHTML = '<p>No tasks found.</p>';
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
         return;
-      }
-
-      data.forEach(task => {
-        const div = document.createElement('div');
-        div.className = 'task';
-        div.innerHTML = `
-          <h3>${task.name}</h3>
-          <p><strong>Status:</strong> ${task.status}</p>
-          <p><strong>Start:</strong> ${task.startDate ? new Date(task.startDate).toLocaleDateString() : 'N/A'}</p>
-          <p><strong>Due:</strong> ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'N/A'}</p>
-          <p>${task.description || ''}</p>
-          <button onclick="editTask('${task._id}')">Edit</button>
-          <button onclick="deleteTask('${task._id}')">Delete</button>
-        `;
-        taskList.appendChild(div);
-      });
-
-    } catch (err) {
-      console.error(err);
-      alert('Error loading tasks');
-    }
-  }
-
-  async function createTask(e) {
-    e.preventDefault();
-
-    const name = document.getElementById('name').value.trim();
-    const description = document.getElementById('description').value;
-    const status = document.getElementById('status').value;
-    const startDate = document.getElementById('startDate').value;
-    const dueDate = document.getElementById('dueDate').value;
-
-    if (!name) {
-      return alert('Task name is required');
     }
 
-    const taskData = { name, description, status, startDate, dueDate };
+    // --- DOM Elements ---
+    const userNameSpan = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskInput = document.getElementById('taskInput');
+    const taskDescriptionInput = document.getElementById('taskDescriptionInput');
+    const prioritySelect = document.getElementById('prioritySelect');
+    const statusSelect = document.getElementById('statusSelect');
+    const startDateInput = document.getElementById('startDateInput');
+    const dueDateInput = document.getElementById('dueDateInput');
+    const filterPriority = document.getElementById('filterPriority');
+    const taskList = document.getElementById('taskList');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const profileBtn = document.getElementById('profileBtn');
+    const notificationContainer = document.getElementById('notification-container');
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
 
-    try {
-      let url = '/tasks';
-      let method = 'POST';
+    // --- App State ---
+    let allTasks = [];
+    let editingTaskId = null;
 
-      if (editingTaskId) {
-        url = `/tasks/${editingTaskId}`;
-        method = 'PUT';
-      }
+    // --- Helper Functions ---
+    const showNotification = (message, isError = false) => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${isError ? 'error' : 'success'}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify(taskData)
-      });
+        setTimeout(() => notification.classList.add('show'), 10);
 
-      const result = await response.json();
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    };
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to save task');
-      }
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        const options = { month: 'short', day: 'numeric', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    };
 
-      document.getElementById('taskForm').reset();
-      editingTaskId = null;
-      document.querySelector('#taskForm button[type="submit"]').textContent = 'Add Task';
-
-      fetchTasks();
-
-    } catch (err) {
-      console.error(err);
-      alert('Error saving task');
-    }
-  }
-
-  async function deleteTask(id) {
-    if (!confirm('Are you sure you want to delete this task?')) return;
-
-    try {
-      const response = await fetch(`/tasks/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer ' + token
+    const fetchUser = async () => {
+        const userName = localStorage.getItem('userName') || 'User';
+        userNameSpan.textContent = userName;
+        userAvatar.textContent = userName.charAt(0).toUpperCase();
+    };
+    
+    const fetchTasks = async () => {
+        try {
+            const response = await fetch('/tasks', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Failed to fetch tasks');
+            allTasks = await response.json();
+            renderTasks();
+            updateStats();
+        } catch (error) {
+            showNotification('Could not load tasks.', true);
         }
-      });
+    };
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to delete task');
-      }
-
-      fetchTasks();
-
-    } catch (err) {
-      console.error(err);
-      alert('Error deleting task');
-    }
-  }
-
-  async function editTask(id) {
-    try {
-      const response = await fetch('/tasks', {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token
+    const renderTasks = () => {
+        const filterValue = filterPriority.value;
+        const filteredTasks = allTasks.filter(task => filterValue === 'all' || task.priority === filterValue);
+        
+        taskList.innerHTML = '';
+        if (filteredTasks.length === 0) {
+            taskList.innerHTML = '<p style="text-align: center; padding: 20px;">No tasks found.</p>';
+            return;
         }
-      });
 
-      const tasks = await response.json();
-      const task = tasks.find(t => t._id === id);
+        filteredTasks.forEach(task => {
+            const taskElement = document.createElement('div');
+            taskElement.className = `task ${task.priority.toLowerCase()} ${task.status}`;
+            taskElement.dataset.id = task._id;
+            
+            taskElement.innerHTML = `
+                <div class="task-content">
+                    <h4>${task.name}</h4>
+                    <p class="description">${task.description || 'No description.'}</p>
+                    <p class="status">Status: <span>${task.status}</span></p>
+                    <p class="start-date">Start date: <span>${formatDate(task.startDate)}</span></p>
+                    <p class="due-date">Due date: <span>${formatDate(task.dueDate)}</span></p>
+                </div>
+                <div class="task-actions">
+                    <button class="done-btn">Done</button>
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                </div>
+            `;
+            taskList.appendChild(taskElement);
+        });
+    };
 
-      if (!task) {
-        return alert('Task not found');
-      }
+    const updateStats = () => {
+        document.getElementById('totalTasks').textContent = allTasks.length;
+        document.getElementById('pendingTasks').textContent = allTasks.filter(t => t.status !== 'completed').length;
+        document.getElementById('completedTasks').textContent = allTasks.filter(t => t.status === 'completed').length;
+    };
 
-      document.getElementById('name').value = task.name;
-      document.getElementById('description').value = task.description || '';
-      document.getElementById('status').value = task.status || 'pending';
-      document.getElementById('startDate').value = task.startDate ? task.startDate.split('T')[0] : '';
-      document.getElementById('dueDate').value = task.dueDate ? task.dueDate.split('T')[0] : '';
+    const handleAddTask = async () => {
+        const name = taskInput.value.trim();
+        if (!name) {
+            showNotification('Task name cannot be empty.', true);
+            return;
+        }
 
-      editingTaskId = id;
-      document.querySelector('#taskForm button[type="submit"]').textContent = 'Update Task';
+        let taskData = { 
+            name, 
+            description: taskDescriptionInput.value.trim(), 
+            priority: prioritySelect.value, 
+            startDate: startDateInput.value, 
+            dueDate: dueDateInput.value, 
+            status: statusSelect.value 
+        };
+        let url = '/tasks';
+        let method = 'POST';
 
-    } catch (err) {
-      console.error(err);
-      alert('Error fetching task for editing');
-    }
-  }
+        if (editingTaskId) {
+            url = `/tasks/${editingTaskId}`;
+            method = 'PUT';
+        }
 
-  document.getElementById('taskForm').addEventListener('submit', createTask);
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(taskData)
+            });
+            if (!response.ok) {
+                const errorResult = await response.json();
+                throw new Error(errorResult.message || 'Failed to save task');
+            }
+            
+            taskInput.value = '';
+            taskDescriptionInput.value = '';
+            prioritySelect.value = 'medium';
+            statusSelect.value = 'pending';
+            startDateInput.value = '';
+            dueDateInput.value = '';
+            addTaskBtn.textContent = 'Add task';
+            editingTaskId = null;
+            
+            showNotification(editingTaskId ? 'Task updated successfully!' : 'Task added successfully!');
+            await fetchTasks();
+        } catch (error) {
+            showNotification(`Could not save task: ${error.message}`, true);
+        }
+    };
+    
+    const handleTaskListClick = async (e) => {
+        const taskElement = e.target.closest('.task');
+        if (!taskElement) return;
 
-  fetchTasks();
+        const id = taskElement.dataset.id;
+        const task = allTasks.find(t => t._id === id);
+        if (!task) return;
+
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+        if (e.target.classList.contains('delete-btn')) {
+            try {
+                const response = await fetch(`/tasks/${id}`, { method: 'DELETE', headers });
+                if (!response.ok) throw new Error('Failed to delete');
+                await fetchTasks();
+                showNotification('Task deleted successfully.');
+            } catch (error) {
+                showNotification('Could not delete task.', true);
+            }
+        } else if (e.target.classList.contains('edit-btn')) {
+            taskInput.value = task.name;
+            taskDescriptionInput.value = task.description;
+            prioritySelect.value = task.priority;
+            statusSelect.value = task.status;
+            startDateInput.value = task.startDate ? task.startDate.split('T')[0] : '';
+            dueDateInput.value = task.dueDate ? task.dueDate.split('T')[0] : '';
+            editingTaskId = id;
+            addTaskBtn.textContent = 'Update Task';
+            taskInput.focus();
+        } else if (e.target.classList.contains('done-btn')) {
+            try {
+                const response = await fetch(`/tasks/${id}`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify({ status: 'completed' })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update task');
+                }
+                await fetchTasks();
+                showNotification('Task marked as completed.');
+            } catch (error) {
+                showNotification('Could not update task status.', true);
+            }
+        }
+    };
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+        }
+    };
+
+    // --- Event Listeners ---
+    addTaskBtn.addEventListener('click', handleAddTask);
+    taskList.addEventListener('click', handleTaskListClick);
+    filterPriority.addEventListener('change', renderTasks);
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userName');
+        window.location.href = 'login.html';
+    });
+    profileBtn.addEventListener('click', () => {
+        window.location.href = 'profile.html';
+    });
+    themeToggle.addEventListener('click', () => {
+        const isDarkMode = body.classList.contains('dark-mode');
+        const newTheme = isDarkMode ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    });
+
+    // --- Initial Load ---
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+    fetchUser();
+    fetchTasks();
+});
 </script>
 </body>
 </html>

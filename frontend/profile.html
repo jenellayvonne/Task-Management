@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="profile-page">
+    <div id="notification-container"></div>
+    <div class="profile-container">
+        <header class="profile-header">
+            <div class="header-buttons">
+                <div id="theme-toggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </div>
+            </div>
+            <h1>Profile</h1>
+            <div class="header-buttons">
+                <button id="backToTodosBtn">← Back to Todos</button>
+                <button id="logoutBtn">Logout</button>
+            </div>
+        </header>
+
+        <div class="profile-body">
+            <div class="overview-header">
+                <div class="avatar-section">
+                    <div class="avatar" id="userAvatar">J</div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalTasks">0</span>
+                        <span class="stat-label">Total Tasks</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="completedTasks">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="pendingTasks">0</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                    <div class="stat-card large">
+                        <span class="stat-number" id="completionRate">0%</span>
+                        <span class="stat-label">Completion Rate</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-link active" data-tab="overview">Overview</button>
+                <button class="tab-link" data-tab="edit-profile">Edit Profile</button>
+                <button class="tab-link" data-tab="change-password">Change Password</button>
+            </div>
+
+            <div id="overview" class="tab-content active">
+                <div class="account-info">
+                    <h2>Account Information</h2>
+                    <div class="info-item">
+                        <span>Username</span>
+                        <strong id="username"></strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Email</span>
+                        <strong id="email"></strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Member Since</span>
+                        <strong id="memberSince"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div id="edit-profile" class="tab-content">
+                <h2>Edit Profile</h2>
+                <form id="editProfileForm">
+                    <div class="form-group">
+                        <label for="usernameInput">Username</label>
+                        <input type="text" id="usernameInput" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailInput">Email</label>
+                        <input type="email" id="emailInput" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Save Changes</button>
+                </form>
+            </div>
+
+            <div id="change-password" class="tab-content">
+                <h2>Change Password</h2>
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const notificationContainer = document.getElementById('notification-container');
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    const showNotification = (message, isError = false) => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${isError ? 'error' : 'success'}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => notification.classList.add('show'), 10);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    };
+
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    };
+
+    const fetchProfileData = async () => {
+        try {
+            // Fetch user profile
+            const userResponse = await fetch('/profile', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!userResponse.ok) throw new Error('Could not fetch profile');
+            const user = await userResponse.json();
+
+            // Fetch user tasks
+            const tasksResponse = await fetch('/tasks', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!tasksResponse.ok) throw new Error('Could not fetch tasks');
+            const tasks = await tasksResponse.json();
+
+            // --- Populate Overview Tab ---
+            document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+            document.getElementById('username').textContent = user.username;
+            document.getElementById('email').textContent = user.email;
+            document.getElementById('memberSince').textContent = formatDate(user.createdAt);
+
+            // --- Populate Stats ---
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(t => t.status === 'completed').length;
+            const pendingTasks = totalTasks - completedTasks;
+            const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('pendingTasks').textContent = pendingTasks;
+            document.getElementById('completionRate').textContent = `${completionRate}%`;
+
+            // --- Populate Edit Profile Tab ---
+            document.getElementById('usernameInput').value = user.username;
+            document.getElementById('emailInput').value = user.email;
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            showNotification(error.message, true);
+        }
+    };
+
+    // --- Tab Switching Logic ---
+    const tabs = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(item => item.classList.remove('active'));
+            tab.classList.add('active');
+
+            const targetTab = document.getElementById(tab.dataset.tab);
+            tabContents.forEach(content => content.classList.remove('active'));
+            targetTab.classList.add('active');
+        });
+    });
+
+    // --- Form Submissions ---
+    document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('usernameInput').value;
+        const email = document.getElementById('emailInput').value;
+
+        try {
+            const response = await fetch('/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ username, email })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Failed to update profile');
+            
+            showNotification('Profile updated successfully!');
+            fetchProfileData(); // Refresh data
+        } catch (error) {
+            showNotification(`Error: ${error.message}`, true);
+        }
+    });
+
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+
+        try {
+            const response = await fetch('/change-password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Failed to change password');
+
+            showNotification('Password changed successfully!');
+            document.getElementById('changePasswordForm').reset();
+        } catch (error) {
+            showNotification(`Error: ${error.message}`, true);
+        }
+    });
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+        }
+    };
+
+    // --- Header Buttons ---
+    document.getElementById('backToTodosBtn').addEventListener('click', () => {
+        window.location.href = 'tasks.html';
+    });
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userName');
+        window.location.href = 'login.html';
+    });
+    themeToggle.addEventListener('click', () => {
+        const isDarkMode = body.classList.contains('dark-mode');
+        const newTheme = isDarkMode ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    });
+
+    // Initial data fetch
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+    fetchProfileData();
+});
+</script>
+</body>
+</html>

@@ -1,94 +1,67 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Register</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      background-color: white;
-      padding: 30px 40px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 350px;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    input[type="text"],
-    input[type="password"] {
-      padding: 10px 15px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      transition: border-color 0.3s;
-    }
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-    button {
-      padding: 10px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .bottom-text {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 14px;
-    }
-    .bottom-text a {
-      color: #007bff;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .bottom-text a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>
+<body class="register-page">
+  <div id="notification-container"></div>
+
   <div class="container">
-    <h2>Register</h2>
+    <div class="avatar">
+      <i class="fas fa-user-plus"></i>
+    </div>
     <form id="registerForm">
-      <input type="text" name="name" placeholder="Full Name" required />
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" name="name" placeholder="Full Name" required />
+      </div>
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="text" name="username" placeholder="Username" required />
+      </div>
+      <div class="input-group">
+        <input type="password" name="password" id="password" placeholder="Password" required />
+        <span class="show-password" id="show-password-toggle"><i class="fas fa-eye"></i></span>
+      </div>
       <button type="submit">Register</button>
     </form>
-    <div class="bottom-text">
+    <p class="login-link">
       Already have an account? <a href="login.html">Login here</a>
-    </div>
+    </p>
   </div>
 
   <script>
     const form = document.getElementById('registerForm');
+    const notificationContainer = document.getElementById('notification-container');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('show-password-toggle');
+
+    const showNotification = (message, isError = false) => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${isError ? 'error' : ''}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => notification.classList.add('show'), 10);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    };
+
+    togglePasswordIcon.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        togglePasswordIcon.querySelector('i').classList.toggle('fa-eye');
+        togglePasswordIcon.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(form);
@@ -107,13 +80,15 @@
 
         const result = await response.json();
         if (response.ok) {
-          alert('Registration successful! Please login.');
-          window.location.href = 'login.html';
+          showNotification('Registration successful! Redirecting to login...');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 2000); // Redirect after 2 seconds
         } else {
-          alert(result.error || 'Registration failed.');
+          showNotification(result.error || 'Registration failed.', true);
         }
       } catch (error) {
-        alert('Error connecting to server.');
+        showNotification('Error connecting to server.', true);
       }
     });
   </script>
