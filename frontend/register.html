@@ -25,8 +25,8 @@
         <input type="text" name="username" placeholder="Username" required />
       </div>
       <div class="input-group">
+        <i class="fas fa-lock"></i>
         <input type="password" name="password" id="password" placeholder="Password" required />
-        <span class="show-password" id="show-password-toggle"><i class="fas fa-eye"></i></span>
       </div>
       <button type="submit">Register</button>
     </form>
@@ -39,7 +39,6 @@
     const form = document.getElementById('registerForm');
     const notificationContainer = document.getElementById('notification-container');
     const passwordInput = document.getElementById('password');
-    const togglePasswordIcon = document.getElementById('show-password-toggle');
 
     const showNotification = (message, isError = false) => {
         const notification = document.createElement('div');
@@ -54,13 +53,6 @@
             setTimeout(() => notification.remove(), 500);
         }, 3000);
     };
-
-    togglePasswordIcon.addEventListener('click', () => {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        togglePasswordIcon.querySelector('i').classList.toggle('fa-eye');
-        togglePasswordIcon.querySelector('i').classList.toggle('fa-eye-slash');
-    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
