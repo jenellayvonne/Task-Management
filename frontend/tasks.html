@@ -64,7 +64,7 @@
           </select>
         </div>
         <div class="input-field">
-          <label for="dueDateInput">Due date</label>
+          <label for="dueDateInput">Judith</label>
           <input type="date" id="dueDateInput" />
         </div>
         <div class="input-field">
@@ -84,7 +84,7 @@
 
       <section class="tasks-list-section">
         <div class="list-header">
-          <h2>Widgets</h2>
+          <h2>Tasks</h2>
           <div class="filter-field">
             <label for="filterPriority">Filter by Priority:</label>
             <select id="filterPriority">
@@ -154,9 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const fetchUser = async () => {
-        const userName = localStorage.getItem('userName') || 'User';
-        userNameSpan.textContent = userName;
-        userAvatar.textContent = userName.charAt(0).toUpperCase();
+        const name = localStorage.getItem('name') || 'User';
+        userNameSpan.textContent = name;
+        userAvatar.textContent = name.charAt(0).toUpperCase();
     };
     
     const fetchTasks = async () => {
@@ -324,7 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
     filterPriority.addEventListener('change', renderTasks);
     logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('userName');
+        localStorage.removeItem('username');
+        localStorage.removeItem('name');
+        localStorage.removeItem('email');
         window.location.href = 'login.html';
     });
     profileBtn.addEventListener('click', () => {

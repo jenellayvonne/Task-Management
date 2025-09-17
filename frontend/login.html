@@ -9,6 +9,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="login-page">
+  <div class="theme-toggle-container">
+    <div id="theme-toggle" title="Toggle Theme">
+      <i class="fas fa-moon"></i>
+      <i class="fas fa-sun"></i>
+    </div>
+  </div>
+
   <div id="notification-container"></div>
   <div class="container">
     <div class="avatar">
@@ -23,12 +30,6 @@
         <i class="fas fa-lock"></i>
         <input type="password" name="password" id="password" placeholder="Password" required autocomplete="current-password" />
       </div>
-      <div class="options">
-        <label class="remember-me">
-          <input type="checkbox" name="remember"> Remember me
-        </label>
-        <a href="#" class="forgot-password">Forgot Password?</a>
-      </div>
       <button type="submit">Login</button>
     </form>
     <p class="register-link">
@@ -37,51 +38,80 @@
   </div>
 
   <script>
-    const form = document.getElementById('loginForm');
-    const notificationContainer = document.getElementById('notification-container');
-    const passwordInput = document.getElementById('password');
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
 
-    const showNotification = (message, isError = false) => {
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+        };
+
+        themeToggle.addEventListener('click', () => {
+            const isDarkMode = body.classList.contains('dark-mode');
+            const newTheme = isDarkMode ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+        const form = document.getElementById('loginForm');
+        const notificationContainer = document.getElementById('notification-container');
+
+        const showNotification = (message, isError = false) => {
+   
+        notificationContainer.innerHTML = '';
+
         const notification = document.createElement('div');
         notification.className = `notification ${isError ? 'error' : ''}`;
         notification.textContent = message;
+
         notificationContainer.appendChild(notification);
 
-        setTimeout(() => notification.classList.add('show'), 10);
+       setTimeout(() => notification.classList.add('show'), 10);
 
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 500);
-        }, 3000);
-    };
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
+};
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
 
-      const formData = new FormData(form);
-      const data = {
-        username: formData.get('username'),
-        password: formData.get('password')
-      };
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
 
-      try {
-        const response = await fetch('/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        }); 
+          const formData = new FormData(form);
+          const data = {
+            username: formData.get('username'),
+            password: formData.get('password')
+          };
 
-        const result = await response.json();
-        if (response.ok) {
-          localStorage.setItem('token', result.token);
-          localStorage.setItem('userName', data.username);
-          window.location.href = 'tasks.html';
-        } else {
-          showNotification(result.message || 'Login failed', true);
-        }
-      } catch (err) {
-        showNotification('An error occurred. Please try again.', true);
-      }
+          try {
+            const response = await fetch('/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+              localStorage.setItem('token', result.token);
+              localStorage.setItem('username', result.username);
+              localStorage.setItem('name', result.name);
+              localStorage.setItem('email', result.email);
+              window.location.href = 'tasks.html';
+            } else {
+              showNotification(result.message || 'Login failed', true);
+            }
+          } catch (err) {
+            showNotification('An error occurred. Please try again.', true);
+          }
+        });
     });
   </script>
 </body>

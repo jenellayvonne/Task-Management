@@ -66,6 +66,10 @@
                         <strong id="username"></strong>
                     </div>
                     <div class="info-item">
+                        <span>Name</span>
+                        <strong id="name"></strong>
+                    </div>
+                    <div class="info-item">
                         <span>Email</span>
                         <strong id="email"></strong>
                     </div>
@@ -151,8 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const tasks = await tasksResponse.json();
 
             // --- Populate Overview Tab ---
-            document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+            document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
             document.getElementById('username').textContent = user.username;
+            document.getElementById('name').textContent = user.name;
             document.getElementById('email').textContent = user.email;
             document.getElementById('memberSince').textContent = formatDate(user.createdAt);
 
@@ -251,7 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('userName');
+        localStorage.removeItem('username');
+        localStorage.removeItem('name');
+        localStorage.removeItem('email');
         window.location.href = 'login.html';
     });
     themeToggle.addEventListener('click', () => {

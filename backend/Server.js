@@ -22,7 +22,8 @@ mongoose.connect('mongodb://localhost:27017/taskdb', {})
 // --- Mongoose Schemas & Models ---
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  name: String,
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
@@ -58,16 +59,20 @@ function authenticateToken(req, res, next) {
 // User Registration
 app.post('/register', async (req, res) => {
   try {
-    const { username, name, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required.' });
+    const { username, name, email, password } = req.body;
+    if (!username || !name || !email || !password) {
+      return res.status(400).json({ error: 'Username, name, email, and password are required.' });
     }
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
+      return res.status(400).json({ error: 'Email already registered.' });
+    }
+    const existingUserByUsername = await User.findOne({ username });
+    if (existingUserByUsername) {
       return res.status(400).json({ error: 'Username already exists.' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, name, password: hashedPassword });
+    const newUser = new User({ username, name, email, password: hashedPassword });
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully.' });
   } catch (err) {
@@ -96,7 +101,7 @@ app.post('/login', async (req, res) => {
       JWT_SECRET,
       { expiresIn: '1h' }
     );
-    res.status(200).json({ token });
+    res.status(200).json({ token, username: user.username, name: user.name, email: user.email });
   } catch (err) {
     console.error('Login Error:', err);
     res.status(500).json({ message: 'Server error during login.' });
@@ -113,6 +118,54 @@ app.get('/profile', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Server error.' });
   }
 });
+
+// Update User Profile
+app.put('/profile', authenticateToken, async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (email && email !== user.email) {
+      const existing = await User.findOne({ email });
+      if (existing) return res.status(400).json({ message: 'Email is already in use' });
+      user.email = email;
+    }
+
+    if (username && username !== user.username) {
+        const existing = await User.findOne({ username });
+        if (existing) return res.status(400).json({ message: 'Username is already in use' });
+        user.username = username;
+    }
+    
+    await user.save();
+    res.json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Change Password
+app.put('/change-password', authenticateToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Incorrect current password' });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 // --- Task Routes ---
 

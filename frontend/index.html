@@ -1,25 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TaskFlow</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task Flow</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="index-page">
-  <header class="navbar">
-    <img src="aretexlogo.png" alt="TaskFlow Logo" class="logo">
-  </header>
-  <div class="container">
-    <h1>Welcome to Task Flow</h1>
-    <p>Flow tasks let you easily manage your daily tasks. You can create a free account, log in, and start adding tasks. You can update their status, set start and due dates, and delete them when they're done. All your tasks are saved under your account, so only you can see and manage them.</p>
-    <div class="buttons">
-      <a href="login.html" class="btn-signin">Sign in</a>
-      <a href="register.html" class="btn-register">Register</a>
+
+    <header class="main-header">
+        <div class="header-content">
+            <nav class="main-nav">
+                <a href="#home">HOME</a>
+                <a href="#about">ABOUT</a>
+                <a href="#contact">CONTACT</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="theme-toggle-container">
+        <div id="theme-toggle" title="Toggle Theme">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </div>
     </div>
-  </div>
+
+    <div id="notification-container"></div>
+
+    <section id="home" class="main-section">
+        <h1>Welcome to Task Flow</h1>
+        <p>Your personal assistant for managing tasks efficiently.</p>
+        <div class="buttons">
+            <a href="login.html" class="btn-signin">Sign In</a>
+            <a href="register.html" class="btn-register">Register</a>
+        </div>
+    </section>
+
+    <section id="about" class="main-section">
+        <h1>About </h1>
+        <p>We are dedicated to helping you stay organized and productive.</p>
+        <p>Flow tasks let you easily manage your daily tasks. </p>
+            <p>You can create a free account, log in, and start adding tasks. </p>
+            <p>You can update their status, set start and due dates, and delete them when they're done. </p>
+            <p>All your tasks are saved under your account, so only you can see and manage them.</p>
+    </section>
+
+    <section id="contact" class="main-section">
+        <h1>Contact Us</h1>
+        <div class="contact-container">
+            <div class="contact-card">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h3>Call Us</h3>
+                <p>12345-6789</p>
+            </div>
+            <div class="contact-card">
+                <div class="contact-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>Contact Us</h3>
+                <p>uasgdua@gmail.com</p>
+                <p>auihfuiaf@gmail.com</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Theme toggle logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+        };
+
+        themeToggle.addEventListener('click', () => {
+            const isDarkMode = body.classList.contains('dark-mode');
+            const newTheme = isDarkMode ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.main-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if(targetSection) {
+                    // Use scrollIntoView for smooth scrolling
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>
