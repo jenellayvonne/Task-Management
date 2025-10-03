@@ -1,4 +1,4 @@
-
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/taskdb', {})
+mongoose.connect('process.env.MONGO_URI', {})
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 

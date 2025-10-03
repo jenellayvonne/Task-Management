@@ -110,7 +110,7 @@
 
             const result = await response.json();
             if (response.ok) {
-              showNotification('Registration successful! Redirecting to login...');
+              showNotification('Registration successful!');
               setTimeout(() => {
                 window.location.href = 'login.html';
               }, 2000); // Redirect after 2 seconds

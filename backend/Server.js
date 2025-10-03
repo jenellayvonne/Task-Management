@@ -1,4 +1,5 @@
-
+require('dotenv').config();
+const cors = require("cors"); 
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -14,9 +15,12 @@ app.use(express.json());
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+console.log("Loaded MONGO_URI:", process.env.MONGO_URI);
+
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/taskdb', {})
-  .then(() => console.log('MongoDB connected successfully'))
+mongoose.connect(process.env.MONGO_URI, {
+})
+  .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('MongoDB connection error:', err));
 
 // --- Mongoose Schemas & Models ---
